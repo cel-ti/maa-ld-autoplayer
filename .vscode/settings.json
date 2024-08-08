@@ -1,0 +1,7 @@
+{
+    "files.exclude": {
+        "LICENSE" : true,
+        ".gitattributes" : true,
+        "requirements.txt" : true
+    }
+}
