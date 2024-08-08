@@ -1,0 +1,16 @@
+[[profile]]
+target = "maa-m9a"
+ld = "re1999"
+pkg = "com.bluepoch.m.en.reverse1999"
+maxrun = 3600
+
+[[profile]]
+target = "maa-snowbreak"
+ld = "snowbreak"
+maxrun = 1200
+
+[[profile]]
+target = "maa-arknights"
+ld = "arknights"
+maxrun = 7600
+
