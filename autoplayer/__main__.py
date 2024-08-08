@@ -1,16 +1,16 @@
-import os
+
 
 
 if __name__ == "__main__":
-    print("updating...")
-    branch_name = "main"  # Change this to your specific branch
+    import sys,os
+    sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
-    # Fetch the latest changes from the remote
-    os.system(f"git fetch origin {branch_name}")
-
-    # Reset the local branch to match the remote branch, keeping local changes
-    os.system(f"git reset --keep origin/{branch_name}")
-
-    # Checkout the latest changes from the remote, using theirs in case of conflicts
-    os.system(f"git checkout -B {branch_name} origin/{branch_name}")
-    
+    import confs.pip_packages 
+    import confs.update_repo
+    confs.update_repo.updating_some_directories(
+        "main",
+        "confs",
+        "autoplayer",
+        "condfigs",
+        "cel_configs",
+    )
