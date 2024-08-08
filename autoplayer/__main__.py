@@ -11,3 +11,7 @@ if __name__ == "__main__":
         "configs",
         "cel_configs",
     )
+
+    import confs.scoop_check
+
+    
