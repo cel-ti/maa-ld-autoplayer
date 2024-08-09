@@ -28,21 +28,24 @@ def profile_config(name : str = None):
 
     return data
 
-
 @cache
-def profile_maa_config(name : str):
+def profile_maa_config_path(name : str):
     name = f"maa-{name}" if "maa" not in name else name
     cel_path = os.path.join("cel_configs", name)
     my_path = os.path.join("my_configs", name)
-
     if os.path.exists(my_path):
-        target = my_path
+        return my_path
     elif os.path.exists(cel_path):
-        target = cel_path
+        return cel_path
     else:
         return None
+@cache
+def profile_maa_config(name : str):
+    path = profile_maa_config_path(name)
+    if not path:
+        return None
     
-    with open(target, "r") as f:
+    with open(path, "r") as f:
         data = json.load(f)
         return data
     

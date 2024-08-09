@@ -1,12 +1,14 @@
+import datetime
 import os
+from time import sleep
 import click
 import sys
 import subprocess
-
+import tempfile
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from utils.config import profile_config
-from utils.runner import _create_profile_thread, run_profile
-from utils.scoop import export_maa_pi_config, get_installed, supported_app_config
+from utils.runner import _create_task, run_profile
+from utils.scoop import export_maa_pi_config, get_app_config, get_installed, supported_app_config
 
 
 @click.group()
@@ -15,7 +17,11 @@ def cli():
 
 @cli.command()
 @click.argument("app")
-def config(app):
+@click.option("--open", "-o", is_flag =True)
+def config(app, open):
+    if open:
+        return os.startfile(get_app_config(app))
+
     if not supported_app_config(app):
         click.echo("Unsupported App")
         return
@@ -25,16 +31,18 @@ def config(app):
 @click.argument("app")
 @click.option("--drun", "-d", default=False, is_flag=True, help="run directly")
 @click.option("--timeout", "-t", default=None, help="timeout")
-def run(app, drun, timeout):
-    if app == "maa-arknights" or app == "arknights":
-        arknights_profile = profile_config("arknights")
-        arknights_profile["subprocess_cmd"] = ["maa-arknights"]
-        _create_profile_thread(arknights_profile)
-        return 
-    
-    if not supported_app_config(app):
+@click.option("--waittime", "-w", default=None, help="waittime")
+@click.option("--use-profile", "-u", is_flag=True, help="use profile")
+def run(app, drun, timeout, waittime, use_profile):
+    profile = profile_config(app)
+    if not profile:
         click.echo("Unsupported App")
         return
+
+    if timeout:
+        profile["maxrun"] = int(timeout)
+    if waittime:
+        profile["waittime"] = int(waittime)
 
     if drun:
         try:
@@ -45,11 +53,49 @@ def run(app, drun, timeout):
     
         return
 
-    config = profile_config(app)
-    if config:
-        return run_profile(config, timeout)
+    if use_profile:
+        temp = tempfile.TemporaryDirectory()
+    else:
+        temp = None
 
-    click.echo("No profile found")
+    return run_profile(profile, timeout, temp)
+
+@cli.command()
+@click.option("--waittime", "-w", default=None, help="waittime")
+@click.option("--test", "-t", default=False, is_flag=True, help="if test, make it 100x faster")
+def auto(waittime, test):
+    profile = profile_config()
+    if not profile:
+        click.echo("Uninited")
+        return
+    
+    temp = tempfile.TemporaryDirectory()
+
+    # starttime is 4 digit number for example, 1300 -> 1pm
+    starttime = profile.get("starttime", None)
+    if starttime:
+        startts = datetime.datetime.strptime(starttime, "%H%M")
+        # Get today's date
+        today = datetime.date.today()
+
+        # Combine today's date with the parsed time
+        startts = datetime.datetime.combine(today, startts.time())
+        now = datetime.datetime.now()
+        if now.hour < startts.hour or (now.hour == startts.hour and now.minute < startts.minute):
+            print(f"Not start yet, start at {starttime}")
+            remainingtime = (startts - now).total_seconds()
+            sleep(remainingtime)
+
+    print("Start!")
+    for p in profile.get("profile", []):
+        if waittime:
+            p["waittime"] = waittime
+        
+        omaxrun = None
+        if test:
+            omaxrun = p.get("maxrun")/100
+
+        run_profile(p, omaxrun, temp)
 
 @cli.command()
 def list():
