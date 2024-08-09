@@ -1,4 +1,4 @@
-import confs.update_repo
-confs.update_repo.updatng_all(
+import autoplayer.init as init
+init.update_repo(
     "main",
 )

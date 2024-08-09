@@ -1,4 +1,4 @@
 import os
 
 
-os.system("py autoplayer")
+os.system("py autoplayer auto")
