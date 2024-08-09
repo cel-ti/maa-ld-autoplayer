@@ -7,3 +7,4 @@ def cli():
 @cli.command()
 def config():
     pass
+

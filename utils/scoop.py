@@ -1,3 +1,4 @@
+import os
 import subprocess
 from functools import cache
 import json
@@ -27,4 +28,20 @@ def get_install_manifest(name : str) -> dict:
     raw = subprocess.run(['scoop', "cat", name], capture_output=True, text=True, check=True, shell=True)
     return json.loads(raw.stdout)
 
+@cache
+def get_install_path() -> str:
+    result = subprocess.run(['scoop', 'which', "scoop"], capture_output=True, text=True, check=True, shell=True)
+    raw = result.stdout
+    return os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(raw))))
+
+@cache
+def get_app_path(name : str):
+    manifest = get_install_manifest(name)
+    assert manifest
+    
+    path = os.path.join(get_install_path(), name, "current")
+
+    assert os.path.exists(path)
+
+    return path
 
