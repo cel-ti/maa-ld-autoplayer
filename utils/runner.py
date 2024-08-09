@@ -6,9 +6,27 @@ from .reldplayer import ldplayer
 import threading 
 import subprocess
 
+def _run_thread(profiledict : dict):
+    ld = profiledict.get("ld", None)
+    subprocess_cmd = profiledict.get("subprocess_cmd", None)
+    maxrun = profiledict.get("maxrun")
+    process = subprocess.Popen(subprocess_cmd, shell=True)
+    try:
+        process.wait(timeout=maxrun)
+    except subprocess.TimeoutExpired:
+        print("Max run time reached, terminating process")
+        process.send_signal(signal.SIGINT)
+        try:
+            process.wait(timeout=5)  # Allow a grace period for shutdown
+        except subprocess.TimeoutExpired:
+            process.kill()
+
+    # killing ld proc
+    if ld:
+        ldplayer().quitall()
+
 def _create_profile_thread(profiledict : dict):
     maxrun = profiledict.get("maxrun")
-    target = profiledict.get("target")
     ld = profiledict.get("ld", None)
     pkg = profiledict.get("pkg", None)
 
@@ -19,21 +37,8 @@ def _create_profile_thread(profiledict : dict):
             ldplayer().launch(name=ld)
         sleep(60)
 
-    # Function to run the target process
-    def run_target():
-        process = subprocess.Popen([target, "-d"], shell=True)
-        try:
-            process.wait(timeout=maxrun)
-        except subprocess.TimeoutExpired:
-            print("Max run time reached, terminating process")
-            process.send_signal(signal.SIGINT)
-            try:
-                process.wait(timeout=5)  # Allow a grace period for shutdown
-            except subprocess.TimeoutExpired:
-                process.kill()
-
     # Start the target in a separate thread
-    target_thread = threading.Thread(target=run_target)
+    target_thread = threading.Thread(target=_run_thread, args=(profiledict,))
     target_thread.start()
 
     # Wait for the maxrun time, then signal the thread to stop
@@ -52,5 +57,7 @@ def run_profile(profiledict : dict, overwrite_maxrun : int = None):
     profiledict = profiledict.copy()
     if overwrite_maxrun:
         profiledict["maxrun"] = overwrite_maxrun
+
+    profiledict["subprocess_cmd"] = [target, "-d"]
 
     _create_profile_thread(profiledict)

@@ -75,12 +75,12 @@ def install_requirements():
     os.system("pip install -U -r requirements.txt")
     print("Package installation complete.")
 
-def init():
-    sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-    
-    update_scoop()
-    install_requirements()
-    update_repo(directories=["configs", "cel_configs"])
 
-    print("Initialization complete.")
+sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+
+update_scoop()
+install_requirements()
+update_repo(directories=["configs", "cel_configs"])
+
+print("Initialization complete.")
 

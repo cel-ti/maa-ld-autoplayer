@@ -1,4 +1,4 @@
-import autoplayer.init as init
-init.update_repo(
+import autoplayer as autoplayer
+autoplayer.update_repo(
     "main",
 )

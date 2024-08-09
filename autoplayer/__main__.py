@@ -4,10 +4,11 @@ import sys
 import subprocess
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from autoplayer.init import init
+from autoplayer import init
 from utils.config import profile_config
-from utils.runner import run_profile
+from utils.runner import _create_profile_thread, run_profile
 from utils.scoop import export_maa_pi_config, get_installed, supported_app_config
+
 
 @click.group()
 def cli():
@@ -26,6 +27,11 @@ def config(app):
 @click.option("--drun", "-d", default=False, is_flag=True, help="run directly")
 @click.option("--timeout", "-t", default=None, help="timeout")
 def run(app, drun, timeout):
+    if app == "maa-arknights" or app == "arknights":
+
+        _create_profile_thread()
+        
+
     if not supported_app_config(app):
         click.echo("Unsupported App")
         return
@@ -39,10 +45,9 @@ def run(app, drun, timeout):
     
         return
 
-    config = profile_config()
-    for profile in config.get("profile", []):
-        if profile["target"] == app:
-            return run_profile(profile, timeout)
+    config = profile_config(app)
+    if config:
+        return run_profile(config, timeout)
 
     click.echo("No profile found")
 
@@ -65,5 +70,4 @@ def export(app, path):
     export_maa_pi_config(app, path)
 
 if __name__ == "__main__":
-    init()
     cli()
