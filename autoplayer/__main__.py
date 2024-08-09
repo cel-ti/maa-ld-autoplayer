@@ -4,7 +4,6 @@ import sys
 import subprocess
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from autoplayer import init
 from utils.config import profile_config
 from utils.runner import _create_profile_thread, run_profile
 from utils.scoop import export_maa_pi_config, get_installed, supported_app_config
@@ -28,10 +27,11 @@ def config(app):
 @click.option("--timeout", "-t", default=None, help="timeout")
 def run(app, drun, timeout):
     if app == "maa-arknights" or app == "arknights":
-
-        _create_profile_thread()
-        
-
+        arknights_profile = profile_config("arknights")
+        arknights_profile["subprocess_cmd"] = ["maa-arknights"]
+        _create_profile_thread(arknights_profile)
+        return 
+    
     if not supported_app_config(app):
         click.echo("Unsupported App")
         return
@@ -70,4 +70,5 @@ def export(app, path):
     export_maa_pi_config(app, path)
 
 if __name__ == "__main__":
+    import autoplayer
     cli()

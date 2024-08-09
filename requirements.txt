@@ -2,3 +2,4 @@ click
 reldplayer
 zrcl
 toml
+python-dotenv

@@ -15,4 +15,5 @@ maxrun = 1200
 target = "maa-arknights"
 ld = "arknights"
 maxrun = 7600
+pkg = "com.hypergryph.arknights.bilibili"
 

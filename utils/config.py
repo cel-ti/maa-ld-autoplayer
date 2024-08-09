@@ -21,7 +21,7 @@ def profile_config(name : str = None):
 
     if name:
         for profile in data.get("profile", []):
-            if target == name or target == f"maa-{name}":
+            if profile["target"] == name or profile["target"] == f"maa-{name}":
                 return profile
 
         return None

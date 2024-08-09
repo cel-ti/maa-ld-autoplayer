@@ -29,13 +29,14 @@ def _create_profile_thread(profiledict : dict):
     maxrun = profiledict.get("maxrun")
     ld = profiledict.get("ld", None)
     pkg = profiledict.get("pkg", None)
+    waittime = profiledict.get("waittime", 60)
 
     if ld:
         if pkg:
             ldplayer().launchex(name=ld, packagename=pkg)
         else:
             ldplayer().launch(name=ld)
-        sleep(60)
+        sleep(waittime)
 
     # Start the target in a separate thread
     target_thread = threading.Thread(target=_run_thread, args=(profiledict,))

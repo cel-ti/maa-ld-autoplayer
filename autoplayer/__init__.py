@@ -4,6 +4,8 @@ import datetime
 from functools import cache
 import utils.scoop as scoop_utils
 from zrcl.ext_json import touch_json, read_json, write_json
+from dotenv import load_dotenv
+load_dotenv()
 
 # Configuration
 CONFIG_DIR = os.path.expanduser("~/.config/maautohelper")
