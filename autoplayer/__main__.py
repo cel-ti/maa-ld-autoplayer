@@ -33,16 +33,18 @@ def config(app, open):
 @click.option("--timeout", "-t", default=None, help="timeout")
 @click.option("--waittime", "-w", default=None, help="waittime")
 @click.option("--use-profile", "-u", is_flag=True, help="use profile")
-def run(app, drun, timeout, waittime, use_profile):
+@click.option("--test", "-t", default=False, is_flag=True, help="if test, make it 100x faster")
+
+def run(app, drun, timeout, waittime, use_profile, test):
     profile = profile_config(app)
     if not profile:
         click.echo("Unsupported App")
         return
 
     if timeout:
-        profile["maxrun"] = int(timeout)
+        profile["maxrun"] = int(timeout) // 100 if test else int(timeout)
     if waittime:
-        profile["waittime"] = int(waittime)
+        profile["waittime"] = int(waittime) // 100 if test else int(waittime)
 
     if drun:
         try:
