@@ -33,6 +33,7 @@ def run_subprocess(profiledict: dict):
 def stop_task_thread(profiledict : dict, windows : list):
     maxrun =  profiledict.get("maxrun")
     maxtime=  datetime.datetime.now() + datetime.timedelta(seconds=maxrun)
+    print(f"will stop at {maxtime.isoformat()}")
     counter = 0
 
     while datetime.datetime.now() < maxtime and any_window_opens(windows):
@@ -42,6 +43,8 @@ def stop_task_thread(profiledict : dict, windows : list):
         if counter % 10 == 0:
             print(f"heartbeat for {profiledict["target"]}...")
 
+
+    print(f"Stopping {profiledict['target']}...")
     close_new_windows(windows)
     
 
@@ -62,6 +65,7 @@ def _create_task(profiledict: dict, blocking = True):
             ldplayer().launchex(name=ld, packagename=pkg)
         else:
             ldplayer().launch(name=ld)
+        print(f"waiting for ldplayer to load for {waittime} seconds")
         time.sleep(waittime)
 
     run_subprocess(profiledict)

@@ -41,8 +41,14 @@ def run(app, drun, timeout, waittime, use_profile, test):
         click.echo("Unsupported App")
         return
 
+    maxrun = profile.get("maxrun", None)
     if timeout:
-        profile["maxrun"] = int(timeout) // 100 if test else int(timeout)
+        maxrun = timeout
+    profile["maxrun"] = int(maxrun) // 100 if test else int(maxrun)
+    if "waittime" in profile:
+        waittime = profile["waittime"]
+    elif not waittime:
+        waittime = 60
     if waittime:
         profile["waittime"] = int(waittime) // 100 if test else int(waittime)
 
@@ -90,14 +96,15 @@ def auto(waittime, test):
 
     print("Start!")
     for p in profile.get("profile", []):
-        if waittime:
-            p["waittime"] = waittime
-        
-        omaxrun = None
-        if test:
-            omaxrun = p.get("maxrun")/100
 
-        run_profile(p, omaxrun, temp)
+        if "waittime" in p:
+            waittime = p["waittime"]
+        elif not waittime:
+            waittime = 60
+        if waittime:
+            p["waittime"] = int(waittime) // 100 if test else int(waittime)   
+
+        run_profile(p, int(p["maxrun"]) // 100 if test else int(p["maxrun"]), temp)
 
 @cli.command()
 def list():
